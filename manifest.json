@@ -1,0 +1,27 @@
+{
+  "name": "Fezzy Station",
+  "short_name": "FEZZY",
+  "description": "11-portal media dashboard. Strategy Over Impulse.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#040408",
+  "theme_color": "#ff3ea5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/ff3ea5/ffffff?text=FEZZY",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/ff3ea5/ffffff?text=FEZZY",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "entertainment", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

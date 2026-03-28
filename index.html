@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STRATEGY OVER IMPULSE — GRANT FEZZY FESTERS</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Bebas+Neue&display=swap');
+
+  :root {
+    --pink:    #ff2d8a;
+    --purple:  #9b30ff;
+    --cyan:    #00e5ff;
+    --dark:    #060610;
+    --card:    #0b0b18;
+    --border:  #161630;
+    --text:    #ddddf8;
+    --dim:     #44446a;
+    --green:   #39ff14;
+    --gold:    #fbbf24;
+    --red:     #ff3333;
+
+    /* INTOX overrides (active when body has .intox) */
+    --i-pink:  #ff0077;
+    --i-bg:    #050508;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow-x: hidden;
+    transition: background 0.6s ease;
+  }
+
+  /* ══════════ SCANLINE OVERLAY ══════════ */
+  body::before {
+    content:'';
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
+    pointer-events:none; z-index:999;
+  }
+
+  /* ══════════ ANIMATIONS ══════════ */
+  @keyframes glitch {
+    0%   { clip-path:inset(0 0 95% 0); transform:translate(-3px,0); }
+    10%  { clip-path:inset(30% 0 50% 0); transform:translate(3px,0); }
+    20%  { clip-path:inset(70% 0 10% 0); transform:translate(-3px,0); }
+    30%  { clip-path:inset(20% 0 70% 0); transform:translate(0,0); }
+    50%  { clip-path:inset(10% 0 85% 0); transform:translate(-3px,0); }
+    100% { clip-path:inset(0 0 0 0); transform:translate(0,0); }
+  }
+  @keyframes glitch2 {
+    0%   { clip-path:inset(50% 0 30% 0); transform:translate(3px,0); color:var(--purple); }
+    25%  { clip-path:inset(80% 0 5% 0); transform:translate(-3px,0); color:var(--cyan); }
+    60%  { clip-path:inset(20% 0 60% 0); transform:translate(3px,0); color:var(--pink); }
+    100% { clip-path:inset(0 0 0 0); transform:translate(0,0); }
+  }
+  @keyframes neonPulse {
+    0%,100% { text-shadow:0 0 8px var(--pink),0 0 24px var(--pink),0 0 48px var(--pink); }
+    50%     { text-shadow:0 0 4px var(--pink),0 0 10px var(--pink); }
+  }
+  @keyframes flicker {
+    0%,95%,100% { opacity:1; }
+    96% { opacity:0.3; }
+    97% { opacity:1; }
+    98% { opacity:0.5; }
+    99% { opacity:1; }
+  }
+  @keyframes slideIn {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes scan {
+    0%   { transform:translateY(-100%); }
+    100% { transform:translateY(100vh); }
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(30px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes borderCycle {
+    0%,100% { border-color:var(--pink);   box-shadow:0 0 10px var(--pink); }
+    33%     { border-color:var(--purple);  box-shadow:0 0 10px var(--purple); }
+    66%     { border-color:var(--cyan);    box-shadow:0 0 10px var(--cyan); }
+  }
+  @keyframes intoxGlitch {
+    0%,100% { transform:translate(0,0) skew(0deg); }
+    20%     { transform:translate(-2px,1px) skew(-1deg); }
+    40%     { transform:translate(2px,-1px) skew(0.5deg); }
+    60%     { transform:translate(-1px,2px) skew(1deg); }
+    80%     { transform:translate(1px,-2px) skew(-0.5deg); }
+  }
+  @keyframes typewriter {
+    from { width:0; }
+    to   { width:100%; }
+  }
+
+  .scanline {
+    position:fixed; top:0; left:0; right:0;
+    height:3px;
+    background:linear-gradient(90deg,transparent,var(--pink),transparent);
+    opacity:0.12;
+    animation:scan 7s linear infinite;
+    pointer-events:none; z-index:998;
+  }
+
+  /* ══════════ MODE TOGGLE BAR ══════════ */
+  .mode-bar {
+    position:sticky; top:0; z-index:900;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 20px;
+    background:rgba(6,6,16,0.95);
+    border-bottom:1px solid var(--border);
+    backdrop-filter:blur(10px);
+  }
+  .mode-label { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--dim); letter-spacing:2px; }
+  .mode-toggle {
+    display:flex; gap:4px; background:#0a0a1a; border:1px solid var(--border); border-radius:6px; padding:3px;
+  }
+  .mode-btn {
+    font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
+    padding:5px 12px; border-radius:4px; cursor:pointer; border:none;
+    letter-spacing:1px; transition:all 0.3s ease; color:var(--dim); background:transparent;
+  }
+  .mode-btn.active-admin  { background:rgba(155,48,255,0.15); color:var(--purple); border:1px solid var(--purple); }
+  .mode-btn.active-intox  { background:rgba(255,45,138,0.15); color:var(--pink); border:1px solid var(--pink); animation:neonPulse 2s infinite; }
+
+  /* ══════════ HEADER ══════════ */
+  .header {
+    padding:40px 20px 24px;
+    border-bottom:1px solid var(--border);
+    animation:slideIn 0.5s ease;
+  }
+  .header-tag { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--pink); letter-spacing:4px; text-transform:uppercase; margin-bottom:10px; }
+  .site-title {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(42px,11vw,72px); font-weight:400; color:var(--pink);
+    letter-spacing:2px; line-height:1; position:relative;
+    animation:neonPulse 4s ease-in-out infinite, flicker 9s infinite;
+  }
+  .site-title::before, .site-title::after {
+    content:'STRATEGY OVER IMPULSE'; position:absolute; top:0; left:0; width:100%;
+  }
+  .site-title::before { animation:glitch 5s infinite; color:var(--cyan); opacity:0.4; }
+  .site-title::after  { animation:glitch2 5s infinite 0.15s; color:var(--purple); opacity:0.4; }
+  .header-sub {
+    margin-top:10px; font-size:11px; color:var(--dim);
+    font-family:'JetBrains Mono',monospace; letter-spacing:2px;
+  }
+  .header-sub span { color:var(--text); }
+  .badges { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .badge { font-size:10px; font-family:'JetBrains Mono',monospace; padding:4px 12px; border-radius:4px; font-weight:700; letter-spacing:1px; }
+  .badge-pink   { background:#1a0010; color:var(--pink);   border:1px solid var(--pink); }
+  .badge-purple { background:#100a1a; color:var(--purple); border:1px solid var(--purple); }
+  .badge-gold   { background:#1a1200; color:var(--gold);   border:1px solid var(--gold); }
+  .badge-green  { background:#0a1a0a; color:var(--green);  border:1px solid var(--green); }
+
+  /* ══════════ INTRO BLOCK ══════════ */
+  .intro-block {
+    padding:24px 20px;
+    border-bottom:1px solid var(--border);
+    border-left:3px solid var(--pink);
+    margin:0;
+    animation:slideIn 0.6s ease;
+  }
+  .intro-block p {
+    font-size:14px; line-height:1.85; color:var(--text); margin-bottom:12px;
+  }
+  .intro-block p:last-child { margin-bottom:0; }
+
+  /* ══════════ SECTION DIVIDER ══════════ */
+  .section-divider {
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px; letter-spacing:4px; color:var(--dim);
+    padding:14px 20px 6px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-divider::after {
+    content:''; flex:1; height:1px;
+    background:linear-gradient(90deg,var(--border),transparent);
+  }
+  .section-divider.pink  { color:var(--pink); }
+  .section-divider.purple { color:var(--purple); }
+  .section-divider.cyan  { color:var(--cyan); }
+
+  /* ══════════ CHAPTER CARDS ══════════ */
+  .chapters { padding:0 20px; }
+
+  .chapter-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--pink);
+    margin-bottom:16px;
+    padding:20px;
+    animation:fadeUp 0.5s ease both;
+    position:relative; overflow:hidden;
+  }
+  .chapter-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg,var(--pink),transparent);
+    opacity:0.4;
+  }
+  .chapter-card.purple-left { border-left-color:var(--purple); }
+  .chapter-card.cyan-left   { border-left-color:var(--cyan); }
+  .chapter-card.gold-left   { border-left-color:var(--gold); }
+  .chapter-card.green-left  { border-left-color:var(--green); }
+  .chapter-card.red-left    { border-left-color:var(--red); }
+
+  .chapter-num {
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    color:var(--dim); letter-spacing:3px; margin-bottom:6px;
+  }
+  .chapter-title {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(26px,6vw,38px); font-weight:400;
+    color:var(--pink); letter-spacing:1px; margin-bottom:4px;
+    line-height:1;
+  }
+  .chapter-card.purple-left .chapter-title { color:var(--purple); }
+  .chapter-card.cyan-left   .chapter-title { color:var(--cyan); }
+  .chapter-card.gold-left   .chapter-title { color:var(--gold); }
+  .chapter-card.green-left  .chapter-title { color:var(--green); }
+
+  .chapter-sub {
+    font-size:11px; color:var(--dim);
+    font-family:'JetBrains Mono',monospace; letter-spacing:1px;
+    margin-bottom:16px;
+  }
+  .chapter-body {
+    font-size:14px; line-height:1.9; color:var(--text);
+  }
+  .chapter-body p { margin-bottom:14px; }
+  .chapter-body p:last-child { margin-bottom:0; }
+
+  /* PLACEHOLDER STYLE */
+  .placeholder {
+    background:rgba(255,45,138,0.04);
+    border:1px dashed rgba(255,45,138,0.25);
+    border-radius:4px; padding:16px;
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    color:rgba(255,45,138,0.5); letter-spacing:1px;
+    margin-bottom:14px; line-height:1.7;
+    text-align:center;
+  }
+  .placeholder.purple {
+    background:rgba(155,48,255,0.04);
+    border-color:rgba(155,48,255,0.25);
+    color:rgba(155,48,255,0.5);
+  }
+
+  /* QUOTE BLOCK */
+  .quote-block {
+    margin:16px 0;
+    padding:16px 20px;
+    border-left:3px solid var(--pink);
+    background:rgba(255,45,138,0.04);
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px; line-height:1.7; color:var(--pink);
+    font-style:italic;
+  }
+  .quote-block.purple { border-left-color:var(--purple); background:rgba(155,48,255,0.04); color:var(--purple); }
+  .quote-block .attr  { font-style:normal; font-size:10px; color:var(--dim); margin-top:8px; letter-spacing:2px; }
+
+  /* HIGHLIGHT SPANS */
+  .hl-pink   { color:var(--pink);   font-weight:600; }
+  .hl-purple { color:var(--purple); font-weight:600; }
+  .hl-cyan   { color:var(--cyan);   font-weight:600; }
+  .hl-gold   { color:var(--gold);   font-weight:600; }
+  .hl-green  { color:var(--green);  font-weight:600; }
+  .hl-red    { color:var(--red);    font-weight:600; }
+
+  /* DUAL COLUMN (Admin vs Intox) */
+  .dual-col {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px;
+  }
+  @media(max-width:600px) { .dual-col { grid-template-columns:1fr; } }
+  .dual-panel {
+    padding:16px; border-radius:4px;
+    font-size:13px; line-height:1.8;
+  }
+  .dual-panel.admin {
+    background:rgba(155,48,255,0.05);
+    border:1px solid rgba(155,48,255,0.2);
+  }
+  .dual-panel.intox {
+    background:rgba(255,45,138,0.05);
+    border:1px solid rgba(255,45,138,0.2);
+  }
+  .dual-panel-title {
+    font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
+    letter-spacing:3px; margin-bottom:10px;
+  }
+  .dual-panel.admin .dual-panel-title { color:var(--purple); }
+  .dual-panel.intox .dual-panel-title { color:var(--pink); }
+
+  /* TIMELINE */
+  .timeline { margin-top:16px; }
+  .timeline-item {
+    display:flex; gap:14px; margin-bottom:14px; position:relative;
+  }
+  .timeline-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:var(--pink); flex-shrink:0; margin-top:6px;
+    box-shadow:0 0 8px var(--pink);
+  }
+  .timeline-dot.purple { background:var(--purple); box-shadow:0 0 8px var(--purple); }
+  .timeline-dot.cyan   { background:var(--cyan);   box-shadow:0 0 8px var(--cyan); }
+  .timeline-content { font-size:13px; line-height:1.7; color:var(--text); }
+  .timeline-label {
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--dim);
+    letter-spacing:2px; margin-bottom:3px;
+  }
+
+  /* STAT ROW */
+  .stat-row {
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;
+  }
+  .stat-chip {
+    padding:8px 14px;
+    background:rgba(255,45,138,0.06);
+    border:1px solid rgba(255,45,138,0.2);
+    border-radius:4px;
+    text-align:center;
+  }
+  .stat-chip .num {
+    font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--pink);
+    display:block; line-height:1;
+  }
+  .stat-chip .lbl {
+    font-family:'JetBrains Mono',monospace; font-size:9px;
+    color:var(--dim); letter-spacing:2px; margin-top:3px; display:block;
+  }
+
+  /* PEOPLE SECTION (coded) */
+  .person-card {
+    background:var(--card); border:1px solid var(--border);
+    border-left:3px solid var(--red);
+    padding:14px; margin-bottom:10px;
+    font-size:13px; line-height:1.7;
+  }
+  .person-code {
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    color:var(--red); letter-spacing:3px; margin-bottom:6px;
+  }
+
+  /* INTOX MODE OVERRIDES */
+  body.intox .chapter-card { animation:intoxGlitch 8s infinite; }
+  body.intox .site-title { animation:neonPulse 1s ease-in-out infinite, flicker 3s infinite; }
+  body.intox .header { background:rgba(20,0,10,0.3); }
+  body.intox .chapter-title { letter-spacing:3px; }
+  body.intox .quote-block { animation:borderCycle 3s infinite; }
+
+  /* ══════════ FOOTER ══════════ */
+  .footer {
+    padding:28px 20px 90px;
+    border-top:1px solid var(--border);
+    text-align:center;
+    margin-top:20px;
+  }
+  .footer-brand {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:20px; color:var(--pink); letter-spacing:3px;
+    animation:neonPulse 3s ease-in-out infinite;
+    margin-bottom:6px;
+  }
+  .footer-sub {
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    color:var(--dim); letter-spacing:2px; margin-bottom:4px;
+  }
+  .footer-sub a { color:var(--pink); text-decoration:none; }
+
+  /* ══════════ BOTTOM NAV ══════════ */
+  .nav-bar {
+    position:fixed; bottom:0; left:0; right:0;
+    display:flex; background:rgba(6,6,16,0.97);
+    border-top:1px solid var(--border);
+    backdrop-filter:blur(12px); z-index:900;
+  }
+  .nav-btn {
+    flex:1; padding:12px 4px;
+    font-family:'JetBrains Mono',monospace; font-size:9px;
+    font-weight:700; letter-spacing:1px; color:var(--dim);
+    background:transparent; border:none; cursor:pointer;
+    transition:color 0.2s; text-transform:uppercase;
+  }
+  .nav-btn:hover, .nav-btn.active { color:var(--pink); }
+</style>
+</head>
+<body id="body">
+<div class="scanline"></div>
+
+<!-- ══ MODE BAR ══ -->
+<div class="mode-bar">
+  <span class="mode-label">SOI · GRANT FEZZY FESTERS</span>
+  <div class="mode-toggle">
+    <button class="mode-btn active-admin" id="adminBtn" onclick="setMode('admin')">ADMIN FEZZY</button>
+    <button class="mode-btn" id="intoxBtn" onclick="setMode('intox')">INTOX FEZZY</button>
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="header-tag">// GRANT FEZZY FESTERS · RAVENSMEAD · 2026</div>
+  <div class="site-title">STRATEGY OVER IMPULSE</div>
+  <div class="header-sub">THE LIFE · THE WEIGHT · THE BUILD · <span>999 FOREVER</span></div>
+  <div class="badges">
+    <span class="badge badge-pink">FEZZY WRLD</span>
+    <span class="badge badge-purple">BOJACK SECURITY</span>
+    <span class="badge badge-gold">STRATEGY OVER IMPULSE</span>
+    <span class="badge badge-green">CAPE TOWN · 2026</span>
+  </div>
+</div>
+
+<!-- ══ INTRO ══ -->
+<div class="intro-block">
+  <!-- ▼▼▼ GRANT — REPLACE THIS WITH YOUR OPENING STATEMENT ▼▼▼ -->
+  <div class="placeholder">
+    [ YOUR OPENING STATEMENT GOES HERE ]<br>
+    Who you are. What this site is. Why you built it.<br>
+    Your voice. Your words. Raw.
+  </div>
+  <!-- ▲▲▲ END PLACEHOLDER ▲▲▲ -->
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAPTER 01 — THE ORIGIN
+════════════════════════════════════════ -->
+<div class="section-divider pink">CHAPTER 01</div>
+<div class="chapters">
+  <div class="chapter-card" style="animation-delay:0.1s">
+    <div class="chapter-num">01 · THE ORIGIN</div>
+    <div class="chapter-title">WHERE I COME FROM</div>
+    <div class="chapter-sub">RAVENSMEAD · CAPE TOWN · SELF-TAUGHT · SELF-MADE</div>
+    <div class="chapter-body">
+
+      <!-- ▼▼▼ REPLACE WITH YOUR CONTENT ▼▼▼ -->
+      <div class="placeholder">
+        [ TELL THEM WHERE YOU'RE FROM ]<br>
+        Ravensmead. What it looks like. What it feels like.<br>
+        What it taught you. What it tried to take from you.
+      </div>
+
+      <div class="placeholder purple">
+        [ YOUR BACKGROUND — MUSIC, BEFORE CODE ]<br>
+        The rapper years. SoundCloud. Audiomack.<br>
+        What music was to you before you had a terminal.
+      </div>
+      <!-- ▲▲▲ END ▲▲▲ -->
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAPTER 02 — THE WEIGHT
+════════════════════════════════════════ -->
+<div class="section-divider purple">CHAPTER 02</div>
+<div class="chapters">
+  <div class="chapter-card purple-left" style="animation-delay:0.15s">
+    <div class="chapter-num">02 · THE WEIGHT</div>
+    <div class="chapter-title">WHAT WAS TAKEN</div>
+    <div class="chapter-sub">5 YEARS · 6 YEARS · TWO STRUCTURES REMOVED AT ONCE</div>
+    <div class="chapter-body">
+
+      <!-- ▼▼▼ REPLACE WITH YOUR CONTENT ▼▼▼ -->
+      <div class="placeholder">
+        [ SPORTSCENE — 5 YEARS ]<br>
+        What you gave. What was taken.<br>
+        How it felt when loyalty meant nothing to them.
+      </div>
+
+      <div class="placeholder purple">
+        [ THE RELATIONSHIP — 6 YEARS ]<br>
+        What you lost. What you gave up of yourself.<br>
+        The quote: "I gave up myself to someone instead of something."
+      </div>
+
+      <div class="placeholder">
+        [ THE ISOLATION ]<br>
+        The apartment. The silence that isn't peaceful.<br>
+        Bojack. The terminal. The work.
+      </div>
+      <!-- ▲▲▲ END ▲▲▲ -->
+
+      <div class="quote-block purple">
+        <!-- ▼▼▼ YOUR REAL QUOTE GOES HERE ▼▼▼ -->
+        "[ YOUR QUOTE ON WHAT YOU LOST — YOUR WORDS ]"
+        <div class="attr">— GRANT FEZZY FESTERS · 2026</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAPTER 03 — THE PEOPLE (CODED)
+════════════════════════════════════════ -->
+<div class="section-divider" style="color:var(--red);">CHAPTER 03</div>
+<div class="chapters">
+  <div class="chapter-card red-left" style="animation-delay:0.2s">
+    <div class="chapter-num">03 · THE PEOPLE</div>
+    <div class="chapter-title" style="color:var(--red);">FAKE FREQUENCIES</div>
+    <div class="chapter-sub">NO NAMES · NO FACES · BUT THEY KNOW WHO THEY ARE</div>
+    <div class="chapter-body">
+
+      <!-- ▼▼▼ INSTRUCTIONS: Use code names — ENTITY A, THE EMPLOYER, etc. No real names ▼▼▼ -->
+      <p>
+        Some people will read this and recognise themselves. That is the point.
+        No names needed when the truth is specific enough.
+      </p>
+
+      <!-- PERSON / ENTITY CARD TEMPLATE — duplicate as needed -->
+      <div class="person-card">
+        <div class="person-code">[ ENTITY 001 ] — ROLE: ___________</div>
+        <div class="placeholder" style="text-align:left; font-family:'Space Grotesk',sans-serif; color:var(--text); border-color:rgba(255,51,51,0.2); background:rgba(255,51,51,0.03);">
+          [ DESCRIBE THIS PERSON'S ACTIONS / WHAT THEY DID ]<br>
+          Their patterns. Their contradictions. What they took or tried to take.<br>
+          Specific enough that they know it's them. General enough that their name stays off this page.
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-code">[ ENTITY 002 ] — ROLE: ___________</div>
+        <div class="placeholder" style="text-align:left; font-family:'Space Grotesk',sans-serif; color:var(--text); border-color:rgba(255,51,51,0.2); background:rgba(255,51,51,0.03);">
+          [ THEIR CHAPTER ]<br>
+          What they did when you needed them. Where they were.<br>
+          What their silence cost you.
+        </div>
+      </div>
+
+      <div class="person-card">
+        <div class="person-code">[ ENTITY 003 ] — ROLE: ___________</div>
+        <div class="placeholder" style="text-align:left; font-family:'Space Grotesk',sans-serif; color:var(--text); border-color:rgba(255,51,51,0.2); background:rgba(255,51,51,0.03);">
+          [ FAMILY SECRETS SECTION ]<br>
+          The things you weren't supposed to say out loud.<br>
+          Say them here. Coded. Yours.
+        </div>
+      </div>
+      <!-- ▲▲▲ Add more ENTITY cards as needed ▲▲▲ -->
+
+      <div class="quote-block" style="border-left-color:var(--red); background:rgba(255,51,51,0.04); color:var(--red);">
+        <!-- ▼▼▼ YOUR REAL QUOTE ▼▼▼ -->
+        "[ YOUR QUOTE ON THE PEOPLE WHO LET YOU DOWN ]"
+        <div class="attr">— GRANT FEZZY FESTERS · 2026</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAPTER 04 — THE TWO FEZZYS
+════════════════════════════════════════ -->
+<div class="section-divider pink">CHAPTER 04</div>
+<div class="chapters">
+  <div class="chapter-card" style="animation-delay:0.25s">
+    <div class="chapter-num">04 · THE DUALITY</div>
+    <div class="chapter-title">THE TWO FEZZYS</div>
+    <div class="chapter-sub">ADMIN FEZZY · INTOXICATED FEZZY · BOTH VALID · BOTH REAL</div>
+    <div class="chapter-body">
+
+      <!-- ▼▼▼ INTRO TEXT ▼▼▼ -->
+      <div class="placeholder">
+        [ EXPLAIN THE DUALITY IN YOUR OWN WORDS ]<br>
+        What Admin Fezzy feels like inside your head.<br>
+        What Intoxicated Fezzy feels like. Why both are necessary.
+      </div>
+
+      <div class="dual-col">
+        <div class="dual-panel admin">
+          <div class="dual-panel-title">ADMIN FEZZY</div>
+          <!-- ▼▼▼ FILL IN ▼▼▼ -->
+          <div class="placeholder purple" style="text-align:left; font-family:'Space Grotesk',sans-serif; color:var(--text);">
+            [ DESCRIBE ADMIN FEZZY ]<br>
+            How you think in this mode.<br>
+            What you build. What you plan.<br>
+            What version number you're on.
+          </div>
+        </div>
+        <div class="dual-panel intox">
+          <div class="dual-panel-title">INTOXICATED FEZZY</div>
+          <!-- ▼▼▼ FILL IN ▼▼▼ -->
+          <div class="placeholder" style="text-align:left; font-family:'Space Grotesk',sans-serif; color:var(--text);">
+            [ DESCRIBE INTOX FEZZY ]<br>
+            The 2am sessions. The rewired portals.<br>
+            What you create when the filter is off.<br>
+            Why this mode ships.
+          </div>
+        </div>
+      </div>
+
+      <div class="quote-block">
+        "Admin Fezzy plans it. Intoxicated Fezzy ships it. Bojack watches the perimeter."
+        <div class="attr">— STRATEGY OVER IMPULSE · 2026</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAPTER 05 — THE BUILD
+════════════════════════════════════════ -->
+<div class="section-divider cyan">CHAPTER 05</div>
+<div class="chapters">
+  <div class="chapter-card cyan-left" style="animation-delay:0.3s">
+    <div class="chapter-num">05 · THE BUILD</div>
+    <div class="chapter-title">WHAT I MADE ANYWAY</div>
+    <div class="chapter-sub">NO PC · NO TRAINING · NO FUNDING · JUST THE TERMINAL</div>
+    <div class="chapter-body">
+
+      <!-- STATS ROW — edit the numbers/labels -->
+      <div class="stat-row">
+        <div class="stat-chip"><span class="num">2800+</span><span class="lbl">LINES</span></div>
+        <div class="stat-chip"><span class="num">55</span><span class="lbl">VERSIONS</span></div>
+        <div class="stat-chip"><span class="num">100K+</span><span class="lbl">VIEWS</span></div>
+        <div class="stat-chip"><span class="num">10</span><span class="lbl">PORTALS</span></div>
+        <div class="stat-chip"><span class="num">30+</span><span class="lbl">TOOLS</span></div>
+      </div>
+
+      <!-- ▼▼▼ FILL IN ▼▼▼ -->
+      <div class="placeholder" style="margin-top:16px;">
+        [ TELL THEM WHAT YOU BUILT AND HOW ]<br>
+        On a rootless Android phone. In Termux. Alone.<br>
+        What it took. What it meant. What it proved.
+      </div>
+
+      <!-- TIMELINE of milestones -->
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-label">PHASE 01 — [ DATE ]</div>
+            <!-- ▼▼▼ ▼▼▼ --> First .bashrc. First script. The beginning.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot purple"></div>
+          <div class="timeline-content">
+            <div class="timeline-label">PHASE 02 — [ DATE ]</div>
+            <!-- ▼▼▼ ▼▼▼ --> Bojack Security born. 2800 lines. GitHub published. 100k views.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot cyan"></div>
+          <div class="timeline-content">
+            <div class="timeline-label">PHASE 03 — [ DATE ]</div>
+            <!-- ▼▼▼ ▼▼▼ --> Fezzy Station V55. 10 portals. GitHub Pages live. Still building.
+          </div>
+        </div>
+        <!-- ▲▲▲ Add more timeline items ▲▲▲ -->
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CHAPTER 06 — THE VISION
+════════════════════════════════════════ -->
+<div class="section-divider" style="color:var(--gold);">CHAPTER 06</div>
+<div class="chapters">
+  <div class="chapter-card gold-left" style="animation-delay:0.35s">
+    <div class="chapter-num">06 · THE VISION</div>
+    <div class="chapter-title">WHERE THIS GOES</div>
+    <div class="chapter-sub">APK · FLASK · PRODUCT SUITE · 999 FOREVER</div>
+    <div class="chapter-body">
+
+      <!-- ▼▼▼ FILL IN ▼▼▼ -->
+      <div class="placeholder" style="border-color:rgba(251,191,36,0.3); background:rgba(251,191,36,0.03); color:rgba(251,191,36,0.6);">
+        [ YOUR VISION IN YOUR WORDS ]<br>
+        Where Fezzy Station goes from here. The APK. The Flask dashboard.<br>
+        What a real product suite built from Ravensmead looks like.<br>
+        What you want the world to say about this work in 5 years.
+      </div>
+
+      <div class="quote-block purple">
+        <!-- ▼▼▼ YOUR CLOSING QUOTE ▼▼▼ -->
+        "[ YOUR QUOTE ON THE FUTURE — WHERE YOU ARE GOING ]"
+        <div class="attr">— GRANT FEZZY FESTERS · 2026</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ 999 FOREVER ══ -->
+<div class="section-divider" style="color:#a855f7; padding-top:24px;">999 FOREVER</div>
+<div class="chapters">
+  <div class="chapter-card" style="border-left-color:#a855f7; background:linear-gradient(135deg,var(--card),#0a0614); animation-delay:0.4s;">
+    <div class="chapter-title" style="color:#c084fc;">BOJACK WATCHES THE PERIMETER</div>
+    <div class="chapter-sub">LAB × HUSKY · SECURITY DAEMON · EMOTIONAL ANCHOR</div>
+    <div class="chapter-body">
+
+      <!-- ▼▼▼ WRITE ABOUT BOJACK ▼▼▼ -->
+      <div class="placeholder purple">
+        [ BOJACK'S SECTION ]<br>
+        The dog. The daemon. The one who stayed.<br>
+        What he means to you. How he's woven into every build.<br>
+        Why his name is on the brand.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<div class="footer">
+  <div class="footer-brand">STRATEGY OVER IMPULSE</div>
+  <div class="footer-sub">GRANT FEZZY FESTERS · RAVENSMEAD · CAPE TOWN</div>
+  <div class="footer-sub">BUILT WITH CLAUDE AI · FEZZY WRLD · BOJACK SECURITY</div>
+  <div class="footer-sub" style="margin-top:6px;">
+    <a href="https://github.com/philfesters">github.com/philfesters</a>
+  </div>
+  <div class="footer-sub" style="color:rgba(255,45,138,0.4); margin-top:12px; font-size:9px; letter-spacing:3px;">
+    999 FOREVER · STRATEGY OVER IMPULSE · 2026
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav class="nav-bar">
+  <button class="nav-btn active" onclick="scrollToChapter(0)">ORIGIN</button>
+  <button class="nav-btn" onclick="scrollToChapter(1)">WEIGHT</button>
+  <button class="nav-btn" onclick="scrollToChapter(2)">PEOPLE</button>
+  <button class="nav-btn" onclick="scrollToChapter(3)">DUALITY</button>
+  <button class="nav-btn" onclick="scrollToChapter(4)">BUILD</button>
+  <button class="nav-btn" onclick="scrollToChapter(5)">VISION</button>
+</nav>
+
+<script>
+// ── MODE TOGGLE ──
+function setMode(mode) {
+  const body    = document.getElementById('body');
+  const adminBtn = document.getElementById('adminBtn');
+  const intoxBtn = document.getElementById('intoxBtn');
+  if (mode === 'intox') {
+    body.classList.add('intox');
+    intoxBtn.classList.add('active-intox');
+    intoxBtn.classList.remove('active-admin');
+    adminBtn.classList.remove('active-admin');
+  } else {
+    body.classList.remove('intox');
+    adminBtn.classList.add('active-admin');
+    adminBtn.classList.remove('active-intox');
+    intoxBtn.classList.remove('active-intox');
+  }
+}
+
+// ── CHAPTER NAV ──
+const chapters = document.querySelectorAll('.chapter-card');
+function scrollToChapter(i) {
+  if (chapters[i]) chapters[i].scrollIntoView({ behavior:'smooth', block:'start' });
+  document.querySelectorAll('.nav-btn').forEach((b,j) => b.classList.toggle('active', j===i));
+}
+
+// ── SCROLL ACTIVE NAV ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = Array.from(chapters).indexOf(entry.target);
+      document.querySelectorAll('.nav-btn').forEach((b,j) => b.classList.toggle('active', j===idx));
+    }
+  });
+}, { threshold:0.4 });
+chapters.forEach(c => observer.observe(c));
+</script>
+</body>
+</html>
